@@ -1,4 +1,16 @@
-import { SET_LOADING, SET_JOB, REMOVE_JOB, HANDLE_PAGE, SET_ITEM } from "../constants/actions";
+import {
+  SET_LOADING,
+  SET_JOB,
+  REMOVE_JOB,
+  HANDLE_PAGE,
+  SET_ITEM,
+  SET_FILTERS_TYPE,
+  RESEST_DATA,
+  SET_FILTERS_LOCATION,
+  SET_PREFERENCE,
+  SET_PREF_TRUE,
+  ADD_PREFERENCE,
+} from "../constants/actions";
 
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
@@ -25,7 +37,13 @@ const reducer = (state, action) => {
           aImage: `${index % 5}.jpeg`,
         };
       });
-      return { ...state, jobArray: salaryJobArray, pages, isLoading: false };
+      return {
+        ...state,
+        jobArray: salaryJobArray,
+        filterArray: salaryJobArray,
+        pages,
+        isLoading: false,
+      };
     }
 
     case SET_ITEM: {
@@ -35,6 +53,64 @@ const reducer = (state, action) => {
       return {
         ...state,
         curItem: payload,
+      };
+    }
+
+    case RESEST_DATA: {
+      return {
+        ...state,
+        jobArray: state.filterArray,
+      };
+    }
+
+    case SET_FILTERS_TYPE: {
+      const { payload } = action;
+      console.log(payload, state.jobLocation);
+
+      return {
+        ...state,
+        jobArray: state.jobArray.filter((item) => {
+          // console.log(
+          //   item.job_type === payload,
+          //   payload,
+          //   item.job_type,
+          //   state.jobLocation.label
+          // );
+
+          if (state.jobLocation.label) {
+            return (
+              item.job_type === payload.label &&
+              item.candidate_required_location === state.jobLocation.label
+            );
+          } else return item.job_type === payload.label;
+        }),
+      };
+    }
+
+    case SET_FILTERS_LOCATION: {
+      const { payload } = action;
+      console.log(payload);
+      return {
+        ...state,
+        jobArray: state.jobArray.filter((item) => {
+          console.log(item.candidate_required_location === payload, payload, item.job_type);
+          return item.candidate_required_location === payload.label;
+        }),
+      };
+    }
+
+    case SET_PREFERENCE: {
+      const { payload } = action;
+      return {
+        ...state,
+        prefArray: payload,
+      };
+    }
+
+    case SET_PREF_TRUE: {
+      return {
+        ...state,
+        preference: action.payload,
       };
     }
   }

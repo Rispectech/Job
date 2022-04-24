@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const router = require("./routers/router");
-const connectDB = "./db/db";
+const connectDB = require("./db/db");
 // import { ErrorRoutes, ErrorHandler } from "./errors/errors";
 require("dotenv").config();
 
@@ -26,7 +26,7 @@ app.use("/api/v1", router);
 
 const start = async () => {
   try {
-    // await connectDB(process.env.MONGO_URI);
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, () => console.log(`server is listening on the port ${port}...`));
   } catch (error) {
     console.log(error);

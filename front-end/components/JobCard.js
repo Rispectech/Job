@@ -1,12 +1,12 @@
 import { Box, Heading, Image, Text } from "@chakra-ui/react";
-import { SmallAddIcon } from "@chakra-ui/icons";
-import React from "react";
+import { CheckIcon, SmallAddIcon } from "@chakra-ui/icons";
+import React, { useState } from "react";
 import { useAppContextValue } from "../context/context";
 
-const getDay = (date, num = 1) => {
+const getDay = (date, num = 2) => {
   const diff = Math.round((Date.now() - new Date(date)) / (1000 * 60 * 60 * 24));
   // console.log(diff);
-  return [diff > num, `${diff}d`];
+  return [diff < num, `${diff}d`];
 };
 
 const JobCard = ({
@@ -20,7 +20,8 @@ const JobCard = ({
   id,
   publication_date,
 }) => {
-  const { setItem, state } = useAppContextValue();
+  const [clicked, setClicked] = useState(false);
+  const { setItem, state, addPreference } = useAppContextValue();
   // console.log(state, id);
   const isActive = state.curItem === id;
   return (
@@ -46,13 +47,27 @@ const JobCard = ({
         </Box>
 
         <Box
-          border="1px solid #76767e"
+          border={!clicked && `1px solid ${clicked ? "white" : "#76767e"}`}
+          backgroundColor={clicked && "teal"}
           w="min-content"
           h="min-content"
           borderRadius="10"
-          p={1}
+          p={2}
         >
-          <SmallAddIcon color={isActive ? "white" : "#76767e"} w={5} h={5} />
+          {clicked ? (
+            <CheckIcon />
+          ) : (
+            <SmallAddIcon
+              color={isActive ? "white" : "#76767e"}
+              w={5}
+              h={5}
+              onClick={() => {
+                console.log("working");
+                addPreference(id);
+                setClicked(true);
+              }}
+            />
+          )}
         </Box>
       </Box>
 
@@ -67,7 +82,7 @@ const JobCard = ({
             mr={2}
             fontWeight={400}
           >
-            {job_type.replace("_", "-")}
+            {job_type && job_type.replace("_", "-")}
           </Box>
           <Box
             as="span"

@@ -1,10 +1,17 @@
 import Head from "next/head";
-import Image from "next/image";
 import JobContainer from "../components/JobSection";
 import styles from "../styles/Home.module.css";
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Button, Fade, Heading, Link, Spinner, Text } from "@chakra-ui/react";
+import { useAppContextValue } from "../context/context";
+import NextLink from "next/link";
+import { useEffect } from "react";
 
 export default function Home() {
+  const { state, setPreference } = useAppContextValue();
+
+  useEffect(() => {
+    setPreference(false);
+  }, []);
   return (
     <section className={styles.container}>
       <Head>
@@ -13,21 +20,74 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <Box w="90%" m="auto">
-          <Box mt={10} mb={10} bgColor="#1c1c24" borderRadius="10" p={5}>
-            <Heading as="h1" size="md">
-              Openings
-            </Heading>
-
-            <Text fontSize="sm" mt={2}>
-              Find what ever jobs suites you the most and never settle for less
-            </Text>
-          </Box>
-
-          <JobContainer />
+      {state.isLoading ? (
+        <Box
+          display="flex"
+          w="90vw"
+          h="90vh"
+          justifyContent="center"
+          alignItems="center"
+          margin="auto"
+          flexDirection="column"
+          gap={4}
+        >
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+            height="10rem"
+            width="10rem"
+          />
+          <Heading textTransform="capitalize" mt={10}>
+            Please Wait , fetching your data ...
+          </Heading>
         </Box>
-      </main>
+      ) : (
+        <Fade in={!state.isLoading}>
+          <main>
+            <Box w="90%" m="auto">
+              <Box
+                mt={10}
+                mb={10}
+                bgColor="#1c1c24"
+                borderRadius="10"
+                p={5}
+                display="flex"
+                flexDirection="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Box>
+                  <Heading as="h1" size="md">
+                    Openings
+                  </Heading>
+
+                  <Text fontSize="sm" mt={2}>
+                    Find what ever jobs suites you the most and never settle for less
+                  </Text>
+                </Box>
+
+                <Box>
+                  <NextLink href="/" passHref>
+                    <Button colorScheme="teal" size="md" mr={4}>
+                      <Link> All Jobs</Link>
+                    </Button>
+                  </NextLink>
+                  <NextLink href="/saved" passHref>
+                    <Button colorScheme="teal" size="md">
+                      <Link>Saved</Link>
+                    </Button>
+                  </NextLink>
+                </Box>
+              </Box>
+
+              {!state.isLoading && <JobContainer />}
+            </Box>
+          </main>
+        </Fade>
+      )}
     </section>
   );
 }

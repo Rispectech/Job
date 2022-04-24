@@ -1,5 +1,15 @@
 import React, { createContext, useContext, useEffect, useReducer } from "react";
-import { SET_ITEM, SET_JOB, SET_LOADING } from "../constants/actions";
+import {
+  ADD_PREFERENCE,
+  RESEST_DATA,
+  SET_FILTERS_LOCATION,
+  SET_FILTERS_TYPE,
+  SET_ITEM,
+  SET_JOB,
+  SET_LOADING,
+  SET_PREFERENCE,
+  SET_PREF_TRUE,
+} from "../constants/actions";
 import reducer from "../reducer/reducer";
 import axios from "axios";
 
@@ -13,9 +23,14 @@ const useAppContextValue = () => {
 const defaultState = {
   isLoading: true,
   jobArray: [],
+  filterArray: [],
   pages: 0,
   curPage: 0,
   curItem: 0,
+  jobType: [],
+  jobLocation: [],
+  prefArray: [],
+  preference: false,
 };
 
 const AppProvider = ({ children }) => {
@@ -35,6 +50,8 @@ const AppProvider = ({ children }) => {
     }
   };
 
+  console.log(state);
+
   const setItem = (id) => {
     console.log(id);
     dispatch({
@@ -42,10 +59,71 @@ const AppProvider = ({ children }) => {
       payload: id,
     });
   };
+
+  const setFilterType = (filterArray) => {
+    console.log(filterArray, "working");
+
+    dispatch({
+      type: RESEST_DATA,
+    });
+    dispatch({
+      type: SET_FILTERS_TYPE,
+      payload: filterArray,
+    });
+  };
+  const setFilterLocation = (filterArray) => {
+    dispatch({
+      type: RESEST_DATA,
+    });
+
+    dispatch({
+      type: SET_FILTERS_LOCATION,
+      payload: filterArray,
+    });
+  };
+
+  const fetchPreference = async () => {
+    const response = await axios(localUrl + "/preference");
+    console.log(response.data, response);
+    dispatch({
+      type: SET_PREFERENCE,
+      payload: response.data,
+    });
+  };
+
+  const addPreference = async (id) => {
+    const response = await axios.post(`${localUrl}/preference/add`, { id });
+    console.log(response);
+  };
+
+  const setPreference = (status = true) => {
+    dispatch({
+      type: SET_PREF_TRUE,
+      payload: status,
+    });
+  };
+
+  console.log(state);
   useEffect(() => {
     fetchData(localUrl);
   }, []);
-  return <AppContext.Provider value={{ state, setItem }}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider
+      value={{
+        state,
+        setItem,
+        setFilterType,
+        setFilterType,
+        setFilterLocation,
+        fetchPreference,
+        addPreference,
+        fetchPreference,
+        setPreference,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
 };
 
 export { useAppContextValue, AppProvider };
